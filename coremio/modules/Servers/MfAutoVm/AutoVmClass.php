@@ -32,20 +32,14 @@ class AutoVmClass
 
     public function templates()
     {
-        $response = $this->sendTemplatesRequest();
 
-        $this->response($response);
+        return $this->request->get('/candy/backend/common/templates');
     }
 
     public function sendTemplatesRequest()
     {
-        $headers = ['token' => self::AUTOVM_ADMIN_TOKEN];
 
-        $address = [
-            self::AUTOVM_BASE, 'candy', 'backend', 'common', 'templates'
-        ];
-
-        return Request::instance()->setAddress($address)->setHeaders($headers)->getResponse()->asObject();
+        return true;
     }
 
     public function sendCreateRequest($poolId, $templateId, $memorySize, $diskSize, $cpuCore, $email)
@@ -232,17 +226,10 @@ class AutoVmClass
         return $this->request->get('/candy/backend/machine/destroy/' . $machineId);
     }
 
-    public function change()
+    public function change($machineId, $templateId)
     {
-        $machineId = $this->getMachineIdFromService();
 
-        // Find the template identity
-        $templateId = autovm_get_query('avmTemplateId');
-
-        // Send request
-        $response = $this->sendChangeRequest($machineId, $templateId);
-
-        $this->response($response);
+        return $this->request->post('/candy/backend/machine/change/' . $machineId, ['templateId' => $templateId]);
     }
 
     public function sendChangeRequest($machineId, $templateId)
@@ -258,25 +245,16 @@ class AutoVmClass
         return Request::instance()->setAddress($address)->setHeaders($headers)->setParams($params)->getResponse()->asObject();
     }
 
-    public function memoryUsage()
+    public function memoryUsage($machineId)
     {
-        $machineId = $this->getMachineIdFromService();
 
-        // Send request
-        $response = $this->sendMemoryUsageRequest($machineId);
-
-        $this->response($response);
+        return $this->request->get('/candy/backend/graph/machine/' . $machineId . '/memory/daily');
     }
 
     public function sendMemoryUsageRequest($machineId)
     {
-        $headers = ['token' => self::AUTOVM_ADMIN_TOKEN];
 
-        $address = [
-            self::AUTOVM_BASE, 'candy', 'backend', 'graph', 'machine', $machineId, 'memory', 'daily'
-        ];
-
-        return Request::instance()->setAddress($address)->setHeaders($headers)->getResponse()->asObject();
+        return $this->request->get('/candy/backend/graph/machine/' . $machineId . '/memory/daily');
     }
 
     public function cpuUsage()

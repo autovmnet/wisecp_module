@@ -298,17 +298,43 @@ class MfAutoVm_Module extends ServerModule
         $_page      = $this->page;
         $_data      = [];
 
+        // memory Usage
+        $machineId = $this->order['options']['config']['machineId'];
+        $show = $this->autoVm->show($machineId);
+        $listTemplates = $this->autoVm->templates();
+
         if(!$_page) $_page = 'home';
 
         if($_page == "home")
         {
-            $_data = ['test1' => 'hello world', 'test2' => 'sample var'];
+            $_data = ['templates' => $listTemplates['data'], 'serverData' => $show['data']];
         }
 
         $content .= $this->clientArea_buttons_output();
 
-        $content .= $this->get_page('clientArea-'.$_page,$_data);
+        $content .= $this->get_page('clientarea-home',$_data);
+
         return  $content;
+    }
+
+    public function use_clientArea_change_os()
+    {
+        $os = $_POST['os'];
+        $machineId = $this->order['options']['config']['machineId'];
+        $response = $this->autoVm->change($machineId, $os);
+        if (isset($response['data'])){
+            echo  Utility::jencode([
+                'status' => "successful",
+                'message' => 'your request was successfully sent',
+            ]);
+        }
+        else
+        {
+            print json_encode($response);
+            die();
+        }
+
+        return true;
     }
 
     public function clientArea_buttons()
